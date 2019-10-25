@@ -4,9 +4,7 @@ import com.autentia.pruebas.application.model.Sample;
 import com.autentia.pruebas.application.repository.SampleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,14 +17,8 @@ public class SampleService {
         this.sampleRepository = sampleRepository;
     }
 
-    public Page<Sample> getAllSamples() {
-        return getAllSamples(0, 10, Sort.by("id").descending());
-    }
-
-    public Page<Sample> getAllSamples(int page, int size, Sort sort) {
-        Pageable askedPage = PageRequest.of(page, size, sort);
-
-        return sampleRepository.findAll(askedPage);
+    public Page<Sample> getAllSamples(Pageable pageRequest) {
+        return sampleRepository.findAll(pageRequest);
     }
 
     public Sample getSampleById(Long sampleId) throws RuntimeException {

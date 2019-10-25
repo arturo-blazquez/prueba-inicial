@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -35,11 +34,11 @@ public class SampleControllerTest {
         Page<Sample> expectedSamples = new PageImpl<>(List.of(sample1, sample2));
         Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
-        when(sampleService.getAllSamples(Mockito.anyInt(), Mockito.anyInt(), Mockito.any())).thenReturn(expectedSamples);
+        when(sampleService.getAllSamples(pageRequest)).thenReturn(expectedSamples);
 
         Page<Sample> samplesFound = sampleController.getAllSamples(pageRequest);
 
-        verify(sampleService).getAllSamples(Mockito.anyInt(), Mockito.anyInt(), Mockito.any());
+        verify(sampleService).getAllSamples(pageRequest);
         assertEquals(samplesFound, expectedSamples);
     }
 
@@ -48,11 +47,11 @@ public class SampleControllerTest {
         Page<Sample> emptySamples = Page.empty();
         Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
-        when(sampleService.getAllSamples(Mockito.anyInt(), Mockito.anyInt(), Mockito.any())).thenReturn(emptySamples);
+        when(sampleService.getAllSamples(pageRequest)).thenReturn(emptySamples);
 
         Page<Sample> samplesFound = sampleController.getAllSamples(pageRequest);
 
-        verify(sampleService).getAllSamples(Mockito.anyInt(), Mockito.anyInt(), Mockito.any());
+        verify(sampleService).getAllSamples(pageRequest);
         assertEquals(samplesFound, emptySamples);
     }
 

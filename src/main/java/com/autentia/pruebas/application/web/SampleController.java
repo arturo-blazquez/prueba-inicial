@@ -19,7 +19,7 @@ public class SampleController {
 
     @RequestMapping(value = "/application/getAll", method = RequestMethod.GET)
     public Page<Sample> getAllSamples(Pageable pageRequest) {
-        return sampleService.getAllSamples(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort());
+        return sampleService.getAllSamples(pageRequest);
     }
 
     @RequestMapping(value = "/application/get/{sampleId}", method = RequestMethod.GET)

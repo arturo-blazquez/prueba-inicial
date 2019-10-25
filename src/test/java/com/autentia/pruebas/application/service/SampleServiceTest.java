@@ -7,8 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,24 +33,26 @@ public class SampleServiceTest {
         Sample sample1 = new Sample(1L, "Juan");
         Sample sample2 = new Sample(2L, "Ana");
         Page<Sample> expectedSamples = new PageImpl<>(List.of(sample1, sample2));
+        Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
-        when(sampleRepository.findAll()).thenReturn(expectedSamples);
+        when(sampleRepository.findAll(pageRequest)).thenReturn(expectedSamples);
 
-        Page<Sample> samplesFound = sampleService.getAllSamples();
+        Page<Sample> samplesFound = sampleService.getAllSamples(pageRequest);
 
-        verify(sampleRepository).findAll();
+        verify(sampleRepository).findAll(pageRequest);
         assertEquals(samplesFound, expectedSamples);
     }
 
     @Test
     public void sample_service_should_get_no_samples_when_there_are_none() {
         Page<Sample> emptySamples = Page.empty();
+        Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
-        when(sampleRepository.findAll()).thenReturn(emptySamples);
+        when(sampleRepository.findAll(pageRequest)).thenReturn(emptySamples);
 
-        Page<Sample> samplesFound = sampleService.getAllSamples();
+        Page<Sample> samplesFound = sampleService.getAllSamples(pageRequest);
 
-        verify(sampleRepository).findAll();
+        verify(sampleRepository).findAll(pageRequest);
         assertEquals(samplesFound, emptySamples);
     }
 
