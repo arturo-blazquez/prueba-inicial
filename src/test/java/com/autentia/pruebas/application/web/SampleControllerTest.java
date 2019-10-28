@@ -18,14 +18,14 @@ public class SampleControllerTest {
     private SampleController sampleController;
     private SampleService sampleService;
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Before
     public void init() {
         sampleService = mock(SampleService.class);
         sampleController = new SampleController(sampleService);
     }
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void sample_controller_should_get_all_samples_when_some_exist() {
@@ -59,23 +59,23 @@ public class SampleControllerTest {
     public void sample_controller_should_get_sample_when_id_exists() {
         Sample sample1 = new Sample(1L, "Juan");
 
-        when(sampleService.getSampleById(1L)).thenReturn(sample1);
+        when(sampleService.getSampleById(anyLong())).thenReturn(sample1);
 
         Sample sampleFound = sampleController.getSampleById(1L);
 
-        verify(sampleService).getSampleById(1L);
+        verify(sampleService).getSampleById(anyLong());
         assertEquals(sampleFound, sample1);
     }
 
     @Test
     public void sample_controller_should_get_no_samples_when_id_does_not_exist() {
-        when(sampleService.getSampleById(1L)).thenThrow(new RuntimeException("Sample no encontrado"));
+        when(sampleService.getSampleById(anyLong())).thenThrow(new RuntimeException("Sample no encontrado"));
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no encontrado");
-        Sample sampleFound = sampleController.getSampleById(1L);
+        sampleController.getSampleById(1L);
 
-        verify(sampleService).getSampleById(1L);
+        verify(sampleService).getSampleById(anyLong());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class SampleControllerTest {
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample ya en la base de datos");
-        Sample sampleFound = sampleController.addSample(sample1);
+        sampleController.addSample(sample1);
 
         verify(sampleService).addSample(sample1);
     }
@@ -108,11 +108,11 @@ public class SampleControllerTest {
         String newName = "Ana";
         Sample sample2 = new Sample(1L, newName);
 
-        when(sampleService.updateSample(1L, newName)).thenReturn(sample2);
+        when(sampleService.updateSample(anyLong(), anyString())).thenReturn(sample2);
 
         Sample sampleUpdated = sampleController.updateSample(1L, newName);
 
-        verify(sampleService).updateSample(1L, newName);
+        verify(sampleService).updateSample(anyLong(), anyString());
         assertEquals(sampleUpdated, sample2);
     }
 
@@ -120,35 +120,35 @@ public class SampleControllerTest {
     public void sample_controller_should_not_update_a_sample_when_it_does_not_exists() {
         String newName = "Ana";
 
-        when(sampleService.updateSample(1L, newName)).thenThrow(new RuntimeException("Sample no existe en la base de datos"));
+        when(sampleService.updateSample(anyLong(), anyString())).thenThrow(new RuntimeException("Sample no existe en la base de datos"));
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no existe en la base de datos");
-        Sample sampleFound = sampleController.updateSample(1L, newName);
+        sampleController.updateSample(1L, newName);
 
-        verify(sampleService).updateSample(1L, newName);
+        verify(sampleService).updateSample(anyLong(), anyString());
     }
 
     @Test
     public void sample_controller_should_delete_a_sample_when_it_exists() {
         Sample sample1 = new Sample(1L, "Juan");
 
-        when(sampleService.deleteSample(1L)).thenReturn(sample1);
+        when(sampleService.deleteSample(anyLong())).thenReturn(sample1);
 
         Sample sampleDeleted = sampleController.deleteSample(1L);
 
-        verify(sampleService).deleteSample(1L);
+        verify(sampleService).deleteSample(anyLong());
         assertEquals(sampleDeleted, sample1);
     }
 
     @Test
     public void sample_controller_should_not_delete_a_sample_when_it_does_not_exists() {
-        when(sampleService.deleteSample(1L)).thenThrow(new RuntimeException("Sample no existe en la base de datos"));
+        when(sampleService.deleteSample(anyLong())).thenThrow(new RuntimeException("Sample no existe en la base de datos"));
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no existe en la base de datos");
-        Sample sampleDeleted = sampleController.deleteSample(1L);
+        sampleController.deleteSample(1L);
 
-        verify(sampleService).deleteSample(1L);
+        verify(sampleService).deleteSample(anyLong());
     }
 }

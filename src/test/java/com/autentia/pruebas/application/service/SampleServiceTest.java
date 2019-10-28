@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -19,14 +18,14 @@ public class SampleServiceTest {
     private SampleService sampleService;
     private SampleRepository sampleRepository;
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Before
     public void init() {
         sampleRepository = mock(SampleRepository.class);
         sampleService = new SampleService(sampleRepository);
     }
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void sample_service_should_get_all_samples_when_some_exist() {
@@ -61,11 +60,11 @@ public class SampleServiceTest {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(optionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
 
         Sample sampleFound = sampleService.getSampleById(1L);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
         assertEquals(sampleFound, sample1);
     }
 
@@ -73,13 +72,13 @@ public class SampleServiceTest {
     public void sample_service_should_get_no_samples_when_id_does_not_exist() {
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(emptyOptionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no encontrado");
         Sample sampleFound = sampleService.getSampleById(1L);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
     }
 
     @Test
@@ -87,12 +86,12 @@ public class SampleServiceTest {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(emptyOptionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
         when(sampleRepository.save(sample1)).thenReturn(sample1);
 
         Sample sampleAdded = sampleService.addSample(sample1);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
         verify(sampleRepository).save(sample1);
         assertEquals(sampleAdded, sample1);
     }
@@ -102,13 +101,13 @@ public class SampleServiceTest {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(optionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample ya en la base de datos");
-        Sample sampleFound = sampleService.addSample(sample1);
+        sampleService.addSample(sample1);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
     }
 
     @Test
@@ -118,12 +117,12 @@ public class SampleServiceTest {
         Sample sample2 = new Sample(1L, newName);
         Optional<Sample> optionalSample = Optional.of(sample1);
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(optionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
         when(sampleRepository.save(sample2)).thenReturn(sample2);
 
         Sample sampleUpdated = sampleService.updateSample(1L, newName);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
         verify(sampleRepository).save(sample2);
         assertEquals(sampleUpdated, sample2);
     }
@@ -133,13 +132,13 @@ public class SampleServiceTest {
         String newName = "Ana";
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(emptyOptionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no existe en la base de datos");
-        Sample sampleFound = sampleService.updateSample(1L, newName);
+        sampleService.updateSample(1L, newName);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
     }
 
     @Test
@@ -147,11 +146,11 @@ public class SampleServiceTest {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(optionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
 
         Sample sampleDeleted = sampleService.deleteSample(1L);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
         verify(sampleRepository).delete(sample1);
         assertEquals(sampleDeleted, sample1);
     }
@@ -160,12 +159,12 @@ public class SampleServiceTest {
     public void sample_service_should_not_delete_a_sample_when_it_does_not_exists() {
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
-        when(sampleRepository.findById(Mockito.anyLong())).thenReturn(emptyOptionalSample);
+        when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no existe en la base de datos");
-        Sample sampleDeleted = sampleService.deleteSample(1L);
+        sampleService.deleteSample(1L);
 
-        verify(sampleRepository).findById(Mockito.anyLong());
+        verify(sampleRepository).findById(anyLong());
     }
 }
