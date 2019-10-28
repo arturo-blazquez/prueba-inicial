@@ -17,27 +17,27 @@ public class SampleController {
         this.sampleService = sampleService;
     }
 
-    @RequestMapping(value = "/application/getAll", method = RequestMethod.GET)
+    @GetMapping(value = "/application/getAll")
     public Page<Sample> getAllSamples(Pageable pageRequest) {
         return sampleService.getAllSamples(pageRequest);
     }
 
-    @RequestMapping(value = "/application/get/{sampleId}", method = RequestMethod.GET)
+    @GetMapping(value = "/application/get/{sampleId}")
     public Sample getSampleById(@PathVariable("sampleId") Long sampleId) {
         return sampleService.getSampleById(sampleId);
     }
 
-    @RequestMapping(value = "/application/add", method = RequestMethod.POST)
+    @PostMapping(value = "/application/add")
     public Sample addSample(@RequestBody Sample sample) {
         return sampleService.addSample(sample);
     }
 
-    @RequestMapping(value = "/application/update/{sampleId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/application/update/{sampleId}")
     public Sample updateSample(@PathVariable("sampleId") Long userId, @RequestBody String newName) {
         return sampleService.updateSample(userId, newName);
     }
 
-    @RequestMapping(value = "/application/delete/{sampleId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/application/delete/{sampleId}")
     public Sample deleteSample(@PathVariable("sampleId") Long sampleId) {
         return sampleService.deleteSample(sampleId);
     }

@@ -21,11 +21,11 @@ public class SampleService {
         return sampleRepository.findAll(pageRequest);
     }
 
-    public Sample getSampleById(Long sampleId) throws RuntimeException {
+    public Sample getSampleById(Long sampleId) {
         return sampleRepository.findById(sampleId).orElseThrow(() -> new RuntimeException("Sample no encontrado"));
     }
 
-    public Sample addSample(Sample sample) throws RuntimeException {
+    public Sample addSample(Sample sample) {
         if (sampleRepository.findById(sample.getId()).isPresent()) {
             throw new RuntimeException("Sample ya en la base de datos");
         } else {
@@ -34,7 +34,7 @@ public class SampleService {
         }
     }
 
-    public Sample updateSample(Long sampleId, String newName) throws RuntimeException {
+    public Sample updateSample(Long sampleId, String newName) {
         Sample sampleToUpdate = sampleRepository.findById(sampleId).orElseThrow(() -> new RuntimeException("Sample no existe en la base de datos"));
 
         sampleToUpdate.setName(newName);
@@ -43,7 +43,7 @@ public class SampleService {
         return sampleToUpdate;
     }
 
-    public Sample deleteSample(Long sampleId) throws RuntimeException {
+    public Sample deleteSample(Long sampleId) {
         Sample sampleToDelete = sampleRepository.findById(sampleId).orElseThrow(() -> new RuntimeException("Sample no existe en la base de datos"));
 
         sampleRepository.delete(sampleToDelete);
