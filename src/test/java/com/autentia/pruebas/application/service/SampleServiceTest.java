@@ -76,7 +76,7 @@ public class SampleServiceTest {
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Sample no encontrado");
-        Sample sampleFound = sampleService.getSampleById(1L);
+        sampleService.getSampleById(1L);
 
         verify(sampleRepository).findById(anyLong());
     }
