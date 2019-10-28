@@ -1,5 +1,7 @@
 package com.autentia.pruebas.application.web;
 
+import com.autentia.pruebas.application.exceptions.SampleAlreadyCreatedException;
+import com.autentia.pruebas.application.exceptions.SampleNotFoundException;
 import com.autentia.pruebas.application.model.Sample;
 import com.autentia.pruebas.application.service.SampleService;
 import org.junit.Before;
@@ -56,7 +58,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_get_sample_when_id_exists() {
+    public void sample_controller_should_get_sample_when_id_exists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.getSampleById(anyLong())).thenReturn(sample1);
@@ -68,18 +70,18 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_get_no_samples_when_id_does_not_exist() {
-        when(sampleService.getSampleById(anyLong())).thenThrow(new RuntimeException("Sample no encontrado"));
+    public void sample_controller_should_get_no_samples_when_id_does_not_exist() throws SampleNotFoundException {
+        when(sampleService.getSampleById(anyLong())).thenThrow(new SampleNotFoundException());
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample no encontrado");
+        thrown.expect(SampleNotFoundException.class);
+        thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleController.getSampleById(1L);
 
         verify(sampleService).getSampleById(anyLong());
     }
 
     @Test
-    public void sample_controller_should_add_a_new_sample_when_its_doesnt_already_exist() {
+    public void sample_controller_should_add_a_new_sample_when_its_doesnt_already_exist() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.addSample(sample1)).thenReturn(sample1);
@@ -91,20 +93,20 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_not_add_a_new_sample_when_it_already_exists() {
+    public void sample_controller_should_not_add_a_new_sample_when_it_already_exists() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
 
-        when(sampleService.addSample(sample1)).thenThrow(new RuntimeException("Sample ya en la base de datos"));
+        when(sampleService.addSample(sample1)).thenThrow(new SampleAlreadyCreatedException());
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample ya en la base de datos");
+        thrown.expect(SampleAlreadyCreatedException.class);
+        thrown.expectMessage(SampleAlreadyCreatedException.ERROR_MESSAGE);
         sampleController.addSample(sample1);
 
         verify(sampleService).addSample(sample1);
     }
 
     @Test
-    public void sample_controller_should_update_a_sample_when_it_exists() {
+    public void sample_controller_should_update_a_sample_when_it_exists() throws SampleNotFoundException {
         String newName = "Ana";
         Sample sample2 = new Sample(1L, newName);
 
@@ -117,20 +119,20 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_not_update_a_sample_when_it_does_not_exists() {
+    public void sample_controller_should_not_update_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
         String newName = "Ana";
 
-        when(sampleService.updateSample(anyLong(), anyString())).thenThrow(new RuntimeException("Sample no existe en la base de datos"));
+        when(sampleService.updateSample(anyLong(), anyString())).thenThrow(new SampleNotFoundException());
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample no existe en la base de datos");
+        thrown.expect(SampleNotFoundException.class);
+        thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleController.updateSample(1L, newName);
 
         verify(sampleService).updateSample(anyLong(), anyString());
     }
 
     @Test
-    public void sample_controller_should_delete_a_sample_when_it_exists() {
+    public void sample_controller_should_delete_a_sample_when_it_exists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.deleteSample(anyLong())).thenReturn(sample1);
@@ -142,11 +144,11 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_not_delete_a_sample_when_it_does_not_exists() {
-        when(sampleService.deleteSample(anyLong())).thenThrow(new RuntimeException("Sample no existe en la base de datos"));
+    public void sample_controller_should_not_delete_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
+        when(sampleService.deleteSample(anyLong())).thenThrow(new SampleNotFoundException());
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample no existe en la base de datos");
+        thrown.expect(SampleNotFoundException.class);
+        thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleController.deleteSample(1L);
 
         verify(sampleService).deleteSample(anyLong());

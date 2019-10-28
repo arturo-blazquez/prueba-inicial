@@ -1,5 +1,7 @@
 package com.autentia.pruebas.application.service;
 
+import com.autentia.pruebas.application.exceptions.SampleAlreadyCreatedException;
+import com.autentia.pruebas.application.exceptions.SampleNotFoundException;
 import com.autentia.pruebas.application.model.Sample;
 import com.autentia.pruebas.application.repository.SampleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +11,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SampleService {
+    private final SampleRepository sampleRepository;
 
     @Autowired
-    private SampleRepository sampleRepository;
-
     public SampleService(SampleRepository sampleRepository) {
         this.sampleRepository = sampleRepository;
     }
@@ -21,21 +22,21 @@ public class SampleService {
         return sampleRepository.findAll(pageRequest);
     }
 
-    public Sample getSampleById(Long sampleId) {
-        return sampleRepository.findById(sampleId).orElseThrow(() -> new RuntimeException("Sample no encontrado"));
+    public Sample getSampleById(Long sampleId) throws SampleNotFoundException {
+        return sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
     }
 
-    public Sample addSample(Sample sample) {
+    public Sample addSample(Sample sample) throws SampleAlreadyCreatedException {
         if (sampleRepository.findById(sample.getId()).isPresent()) {
-            throw new RuntimeException("Sample ya en la base de datos");
+            throw new SampleAlreadyCreatedException();
         } else {
             sampleRepository.save(sample);
             return sample;
         }
     }
 
-    public Sample updateSample(Long sampleId, String newName) {
-        Sample sampleToUpdate = sampleRepository.findById(sampleId).orElseThrow(() -> new RuntimeException("Sample no existe en la base de datos"));
+    public Sample updateSample(Long sampleId, String newName) throws SampleNotFoundException {
+        Sample sampleToUpdate = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
 
         sampleToUpdate.setName(newName);
 
@@ -43,8 +44,8 @@ public class SampleService {
         return sampleToUpdate;
     }
 
-    public Sample deleteSample(Long sampleId) {
-        Sample sampleToDelete = sampleRepository.findById(sampleId).orElseThrow(() -> new RuntimeException("Sample no existe en la base de datos"));
+    public Sample deleteSample(Long sampleId) throws SampleNotFoundException {
+        Sample sampleToDelete = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
 
         sampleRepository.delete(sampleToDelete);
         return sampleToDelete;

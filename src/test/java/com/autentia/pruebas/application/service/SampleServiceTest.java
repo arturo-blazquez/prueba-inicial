@@ -1,5 +1,7 @@
 package com.autentia.pruebas.application.service;
 
+import com.autentia.pruebas.application.exceptions.SampleAlreadyCreatedException;
+import com.autentia.pruebas.application.exceptions.SampleNotFoundException;
 import com.autentia.pruebas.application.model.Sample;
 import com.autentia.pruebas.application.repository.SampleRepository;
 import org.junit.Before;
@@ -56,7 +58,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_get_sample_when_id_exists() {
+    public void sample_service_should_get_sample_when_id_exists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
@@ -69,20 +71,20 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_get_no_samples_when_id_does_not_exist() {
+    public void sample_service_should_get_no_samples_when_id_does_not_exist() throws SampleNotFoundException {
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
         when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample no encontrado");
+        thrown.expect(SampleNotFoundException.class);
+        thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleService.getSampleById(1L);
 
         verify(sampleRepository).findById(anyLong());
     }
 
     @Test
-    public void sample_service_should_add_a_new_sample_when_it_doesnt_already_exist() {
+    public void sample_service_should_add_a_new_sample_when_it_doesnt_already_exist() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
@@ -97,21 +99,21 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_not_add_a_new_sample_when_it_already_exists() {
+    public void sample_service_should_not_add_a_new_sample_when_it_already_exists() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
         when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample ya en la base de datos");
+        thrown.expect(SampleAlreadyCreatedException.class);
+        thrown.expectMessage(SampleAlreadyCreatedException.ERROR_MESSAGE);
         sampleService.addSample(sample1);
 
         verify(sampleRepository).findById(anyLong());
     }
 
     @Test
-    public void sample_service_should_update_a_sample_when_it_exists() {
+    public void sample_service_should_update_a_sample_when_it_exists() throws SampleNotFoundException {
         String newName = "Ana";
         Sample sample1 = new Sample(1L, "Juan");
         Sample sample2 = new Sample(1L, newName);
@@ -128,21 +130,21 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_not_update_a_sample_when_it_does_not_exists() {
+    public void sample_service_should_not_update_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
         String newName = "Ana";
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
         when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample no existe en la base de datos");
+        thrown.expect(SampleNotFoundException.class);
+        thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleService.updateSample(1L, newName);
 
         verify(sampleRepository).findById(anyLong());
     }
 
     @Test
-    public void sample_service_should_delete_a_sample_when_it_exists() {
+    public void sample_service_should_delete_a_sample_when_it_exists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
@@ -156,13 +158,13 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_not_delete_a_sample_when_it_does_not_exists() {
+    public void sample_service_should_not_delete_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
         when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Sample no existe en la base de datos");
+        thrown.expect(SampleNotFoundException.class);
+        thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleService.deleteSample(1L);
 
         verify(sampleRepository).findById(anyLong());
