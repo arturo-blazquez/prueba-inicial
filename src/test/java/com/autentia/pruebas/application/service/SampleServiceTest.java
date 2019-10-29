@@ -36,11 +36,11 @@ public class SampleServiceTest {
         Page<Sample> expectedSamples = new PageImpl<>(List.of(sample1, sample2));
         Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
-        when(sampleRepository.findAll(pageRequest)).thenReturn(expectedSamples);
+        when(sampleRepository.findAll(any(Pageable.class))).thenReturn(expectedSamples);
 
         Page<Sample> samplesFound = sampleService.getAllSamples(pageRequest);
 
-        verify(sampleRepository).findAll(pageRequest);
+        verify(sampleRepository).findAll(any(Pageable.class));
         assertEquals(samplesFound, expectedSamples);
     }
 
@@ -49,11 +49,11 @@ public class SampleServiceTest {
         Page<Sample> emptySamples = Page.empty();
         Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
-        when(sampleRepository.findAll(pageRequest)).thenReturn(emptySamples);
+        when(sampleRepository.findAll(any(Pageable.class))).thenReturn(emptySamples);
 
         Page<Sample> samplesFound = sampleService.getAllSamples(pageRequest);
 
-        verify(sampleRepository).findAll(pageRequest);
+        verify(sampleRepository).findAll(any(Pageable.class));
         assertEquals(samplesFound, emptySamples);
     }
 
