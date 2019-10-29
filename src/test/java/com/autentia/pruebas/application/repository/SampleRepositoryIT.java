@@ -19,7 +19,7 @@ public class SampleRepositoryIT {
     private SampleRepository sampleRepository;
 
     @Test
-    public void ShouldFindAllSamples() {
+    public void shouldFindAllSamples() {
         Sample sample1 = new Sample(1L, "Juan");
         Sample sample2 = new Sample(2L, "Ana");
         List<Sample> expectedSamples = List.of(sample1, sample2);
