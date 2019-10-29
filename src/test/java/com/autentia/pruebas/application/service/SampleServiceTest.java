@@ -30,7 +30,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_get_all_samples_when_some_exist() {
+    public void sampleServiceShouldGetAllSamplesWhenSomeExist() {
         Sample sample1 = new Sample(1L, "Juan");
         Sample sample2 = new Sample(2L, "Ana");
         Page<Sample> expectedSamples = new PageImpl<>(List.of(sample1, sample2));
@@ -45,7 +45,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_get_no_samples_when_there_are_none() {
+    public void sampleServiceShouldGetNoSamplesWhenThereAreNone() {
         Page<Sample> emptySamples = Page.empty();
         Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
@@ -58,7 +58,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_get_sample_when_id_exists() throws SampleNotFoundException {
+    public void sampleServiceShouldGetSampleWhenIdExists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
@@ -71,7 +71,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_get_no_samples_when_id_does_not_exist() throws SampleNotFoundException {
+    public void sampleServiceShouldGetNoSamplesWhenIdDoesNotExist() throws SampleNotFoundException {
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
         when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
@@ -84,7 +84,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_add_a_new_sample_when_it_doesnt_already_exist() throws SampleAlreadyCreatedException {
+    public void sampleServiceShouldAddANewSampleWhenItDoesntAlreadyExist() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
@@ -99,7 +99,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_not_add_a_new_sample_when_it_already_exists() throws SampleAlreadyCreatedException {
+    public void sampleServiceShouldNotAddANewSampleWhenItAlreadyExists() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
@@ -113,7 +113,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_update_a_sample_when_it_exists() throws SampleNotFoundException {
+    public void sampleServiceShouldUpdateASampleWhenItExists() throws SampleNotFoundException {
         String newName = "Ana";
         Sample sample1 = new Sample(1L, "Juan");
         Sample sample2 = new Sample(1L, newName);
@@ -130,7 +130,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_not_update_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
+    public void sampleServiceShouldNotUpdateASampleWhenItDoesNotExists() throws SampleNotFoundException {
         String newName = "Ana";
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
@@ -144,7 +144,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_delete_a_sample_when_it_exists() throws SampleNotFoundException {
+    public void sampleServiceShouldDeleteASampleWhenItExists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
         Optional<Sample> optionalSample = Optional.of(sample1);
 
@@ -158,7 +158,7 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void sample_service_should_not_delete_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
+    public void sampleServiceShouldNotDeleteASampleWhenItDoesNotExists() throws SampleNotFoundException {
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
         when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);

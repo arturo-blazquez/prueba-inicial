@@ -9,6 +9,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_get_all_samples_when_some_exist() {
+    public void sampleControllerShouldGetAllSamplesWhenSomeExist() {
         Sample sample1 = new Sample(1L, "Juan");
         Sample sample2 = new Sample(2L, "Ana");
         Page<Sample> expectedSamples = new PageImpl<>(List.of(sample1, sample2));
@@ -45,7 +47,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_get_no_samples_when_there_are_none() {
+    public void sampleControllerShouldGetNoSamplesWhenThereAreNone() {
         Page<Sample> emptySamples = Page.empty();
         Pageable pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
 
@@ -58,7 +60,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_get_sample_when_id_exists() throws SampleNotFoundException {
+    public void sampleControllerShouldGetSampleWhenIdExists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.getSampleById(anyLong())).thenReturn(sample1);
@@ -70,7 +72,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_get_no_samples_when_id_does_not_exist() throws SampleNotFoundException {
+    public void sampleControllerShouldGetNoSamplesWhenIdDoesNotExist() throws SampleNotFoundException {
         when(sampleService.getSampleById(anyLong())).thenThrow(new SampleNotFoundException());
 
         thrown.expect(SampleNotFoundException.class);
@@ -81,7 +83,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_add_a_new_sample_when_its_doesnt_already_exist() throws SampleAlreadyCreatedException {
+    public void sampleControllerShouldAddANewSampleWhenItsDoesntAlreadyExist() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.addSample(sample1)).thenReturn(sample1);
@@ -93,7 +95,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_not_add_a_new_sample_when_it_already_exists() throws SampleAlreadyCreatedException {
+    public void sampleControllerShouldNotAddANewSampleWhenItAlreadyExists() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.addSample(sample1)).thenThrow(new SampleAlreadyCreatedException());
@@ -106,7 +108,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_update_a_sample_when_it_exists() throws SampleNotFoundException {
+    public void sampleControllerShouldUpdateASampleWhenItExists() throws SampleNotFoundException {
         String newName = "Ana";
         Sample sample2 = new Sample(1L, newName);
 
@@ -119,7 +121,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_not_update_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
+    public void sampleControllerShouldNotUpdateASampleWhenItDoesNotExists() throws SampleNotFoundException {
         String newName = "Ana";
 
         when(sampleService.updateSample(anyLong(), anyString())).thenThrow(new SampleNotFoundException());
@@ -132,7 +134,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_delete_a_sample_when_it_exists() throws SampleNotFoundException {
+    public void sampleControllerShouldDeleteASampleWhenItExists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
 
         when(sampleService.deleteSample(anyLong())).thenReturn(sample1);
@@ -144,7 +146,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sample_controller_should_not_delete_a_sample_when_it_does_not_exists() throws SampleNotFoundException {
+    public void sampleControllerShouldNotDeleteASampleWhenItDoesNotExists() throws SampleNotFoundException {
         when(sampleService.deleteSample(anyLong())).thenThrow(new SampleNotFoundException());
 
         thrown.expect(SampleNotFoundException.class);
@@ -152,5 +154,21 @@ public class SampleControllerTest {
         sampleController.deleteSample(1L);
 
         verify(sampleService).deleteSample(anyLong());
+    }
+
+    @Test
+    public void sampleControllerShouldHandleSampleNotFoundException() {
+        ResponseEntity<Object> result = sampleController.SampleNotFoundException();
+
+        assertEquals(result.getBody(), SampleNotFoundException.ERROR_MESSAGE);
+        assertEquals(result.getStatusCode(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void sampleControllerShouldHandleSampleAlreadyCreatedException() {
+        ResponseEntity<Object> result = sampleController.SampleAlreadyCreatedException();
+
+        assertEquals(result.getBody(), SampleAlreadyCreatedException.ERROR_MESSAGE);
+        assertEquals(result.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 }
