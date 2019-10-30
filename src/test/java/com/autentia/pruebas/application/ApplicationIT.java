@@ -1,6 +1,7 @@
 package com.autentia.pruebas.application;
 
 import com.autentia.pruebas.application.exceptions.SampleAlreadyCreatedException;
+import com.autentia.pruebas.application.exceptions.SampleBadRequestException;
 import com.autentia.pruebas.application.exceptions.SampleNotFoundException;
 import com.autentia.pruebas.application.model.Sample;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,52 +41,28 @@ public class ApplicationIT {
     public void returnsOKAndAllSamplesWhenYouRequestAllSamples() throws Exception {
         List<Sample> expectedSamples = List.of(sample1, sample2);
 
-        mvc.perform(get("/application/getAll").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/samples").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(objectMapper.writeValueAsString(expectedSamples))));
     }
 
     @Test
-    public void returnsERRORWhenYouRequestAllSamplesWithoutGet() throws Exception {
-        mvc.perform(post("/application/getAll").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(put("/application/getAll").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(delete("/application/getAll").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
-    }
-
-    @Test
     public void returnsOKAndSample1WhenYouRequestSample1() throws Exception {
-        mvc.perform(get("/application/get/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/samples/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(objectMapper.writeValueAsString(sample1))));
     }
 
     @Test
     public void returnsERRORWhenYouRequestSampleOutOfBounds() throws Exception {
-        mvc.perform(get("/application/get/3").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/samples/3").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString(SampleNotFoundException.ERROR_MESSAGE)));
     }
 
     @Test
-    public void returnsERRORWhenYouRequestSampleWithoutGet() throws Exception {
-        mvc.perform(post("/application/get/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(put("/application/get/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(delete("/application/get/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
-    }
-
-    @Test
     public void returnsOKAndSample3WhenYouAddSample3() throws Exception {
-        mvc.perform(post("/application/add").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/samples").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newSample)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(objectMapper.writeValueAsString(newSample))));
@@ -93,25 +70,10 @@ public class ApplicationIT {
 
     @Test
     public void returnsERRORWhenYouWhenYouAddSampleAlreadyInDb() throws Exception {
-        mvc.perform(post("/application/add").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/samples").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sample1)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString(SampleAlreadyCreatedException.ERROR_MESSAGE)));
-    }
-
-    @Test
-    public void returnsERRORWhenYouAddSampleWithoutPost() throws Exception {
-        mvc.perform(get("/application/add").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newSample)))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(put("/application/add").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newSample)))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(delete("/application/add").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newSample)))
-                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
@@ -119,8 +81,8 @@ public class ApplicationIT {
         String newName = "Alex";
         Sample updatedSample = new Sample(1L, newName);
 
-        mvc.perform(put("/application/update/1").contentType(MediaType.APPLICATION_JSON)
-                .content(newName))
+        mvc.perform(put("/samples/1").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedSample)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(objectMapper.writeValueAsString(updatedSample))));
     }
@@ -128,50 +90,50 @@ public class ApplicationIT {
     @Test
     public void returnsERRORWhenYouWhenYouEditSampleNotInDb() throws Exception {
         String newName = "Alex";
+        Sample updatedSample = new Sample(3L, newName);
 
-        mvc.perform(put("/application/update/3").contentType(MediaType.APPLICATION_JSON)
-                .content(newName))
+        mvc.perform(put("/samples/3").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedSample)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString(SampleNotFoundException.ERROR_MESSAGE)));
     }
 
     @Test
-    public void returnsERRORWhenYouEditSampleWithoutPut() throws Exception {
-        String newName = "Ana";
+    public void returnsERRORWhenYouWhenYouEditSampleAndSampleIdDoesntMatchUrlId() throws Exception {
+        String newName = "Alex";
+        Sample updatedSample = new Sample(1L, newName);
 
-        mvc.perform(get("/application/update/1").contentType(MediaType.APPLICATION_JSON).content(newName))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(post("/application/update/1").contentType(MediaType.APPLICATION_JSON).content(newName))
-                .andExpect(status().isMethodNotAllowed());
-
-        mvc.perform(delete("/application/update/1").contentType(MediaType.APPLICATION_JSON).content(newName))
-                .andExpect(status().isMethodNotAllowed());
+        mvc.perform(put("/samples/3").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedSample)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString(SampleBadRequestException.ERROR_MESSAGE)));
     }
 
     @Test
-    public void returnsOKAndSample1WhenYouDeleteSample1() throws Exception {
-        mvc.perform(delete("/application/delete/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(objectMapper.writeValueAsString(sample1))));
+    public void returnsOKWhenYouDeleteSample1() throws Exception {
+        mvc.perform(delete("/samples/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void returnsERRORWhenYouWhenYouDeleteSampleNotInDb() throws Exception {
-        mvc.perform(delete("/application/delete/3").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete("/samples/3").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString(SampleNotFoundException.ERROR_MESSAGE)));
     }
 
     @Test
-    public void returnsERRORWhenYouDeleteSampleWithoutDel() throws Exception {
-        mvc.perform(get("/application/delete/1").contentType(MediaType.APPLICATION_JSON))
+    public void returnsERRORWhenYouDontSpecifyIdInUrlInUpdateOrDelete() throws Exception {
+        mvc.perform(put("/samples").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isMethodNotAllowed());
 
-        mvc.perform(post("/application/delete/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete("/samples").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isMethodNotAllowed());
+    }
 
-        mvc.perform(put("/application/delete/1").contentType(MediaType.APPLICATION_JSON))
+    @Test
+    public void returnsERRORWhenYouUpdateWithIdInUrl() throws Exception {
+        mvc.perform(post("/samples/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isMethodNotAllowed());
     }
 }

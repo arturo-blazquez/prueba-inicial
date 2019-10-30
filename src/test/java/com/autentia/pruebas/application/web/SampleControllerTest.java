@@ -1,6 +1,7 @@
 package com.autentia.pruebas.application.web;
 
 import com.autentia.pruebas.application.exceptions.SampleAlreadyCreatedException;
+import com.autentia.pruebas.application.exceptions.SampleBadRequestException;
 import com.autentia.pruebas.application.exceptions.SampleNotFoundException;
 import com.autentia.pruebas.application.model.Sample;
 import com.autentia.pruebas.application.service.SampleService;
@@ -108,57 +109,69 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sampleControllerShouldUpdateASampleWhenItExists() throws SampleNotFoundException {
+    public void sampleControllerShouldUpdateASampleWhenItExists() throws SampleNotFoundException, SampleBadRequestException {
         String newName = "Ana";
         Sample sample2 = new Sample(1L, newName);
 
-        when(sampleService.updateSample(anyLong(), anyString())).thenReturn(sample2);
+        when(sampleService.updateSample(any(Sample.class))).thenReturn(sample2);
 
-        Sample sampleUpdated = sampleController.updateSample(1L, newName);
+        Sample sampleUpdated = sampleController.updateSample(sample2.getId(), sample2);
 
-        verify(sampleService).updateSample(anyLong(), anyString());
+        verify(sampleService).updateSample(any(Sample.class));
         assertEquals(sampleUpdated, sample2);
     }
 
     @Test
-    public void sampleControllerShouldNotUpdateASampleWhenItDoesNotExists() throws SampleNotFoundException {
+    public void sampleControllerShouldNotUpdateASampleWhenItDoesNotExists() throws SampleNotFoundException, SampleBadRequestException {
         String newName = "Ana";
+        Sample sample2 = new Sample(1L, newName);
 
-        when(sampleService.updateSample(anyLong(), anyString())).thenThrow(new SampleNotFoundException());
+        when(sampleService.updateSample(any(Sample.class))).thenThrow(new SampleNotFoundException());
 
         thrown.expect(SampleNotFoundException.class);
         thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
-        sampleController.updateSample(1L, newName);
+        sampleController.updateSample(sample2.getId(), sample2);
 
-        verify(sampleService).updateSample(anyLong(), anyString());
+        verify(sampleService).updateSample(any(Sample.class));
+    }
+
+    @Test
+    public void sampleControllerShouldNotUpdateASampleWhenSampleIdAndUrlIdDoesntMatch() throws SampleNotFoundException, SampleBadRequestException {
+        String newName = "Ana";
+        Sample sample2 = new Sample(1L, newName);
+
+        thrown.expect(SampleBadRequestException.class);
+        thrown.expectMessage(SampleBadRequestException.ERROR_MESSAGE);
+        sampleController.updateSample(2L, sample2);
+
+        verify(sampleService, never()).updateSample(any(Sample.class));
     }
 
     @Test
     public void sampleControllerShouldDeleteASampleWhenItExists() throws SampleNotFoundException {
         Sample sample1 = new Sample(1L, "Juan");
 
-        when(sampleService.deleteSample(anyLong())).thenReturn(sample1);
+        doNothing().when(sampleService).deleteSample(anyLong());
 
-        Sample sampleDeleted = sampleController.deleteSample(1L);
+        sampleController.deleteSample(1L);
 
-        verify(sampleService).deleteSample(anyLong());
-        assertEquals(sampleDeleted, sample1);
+        verify(sampleService).deleteSample(1L);
     }
 
     @Test
     public void sampleControllerShouldNotDeleteASampleWhenItDoesNotExists() throws SampleNotFoundException {
-        when(sampleService.deleteSample(anyLong())).thenThrow(new SampleNotFoundException());
+        doThrow(new SampleNotFoundException()).when(sampleService).deleteSample(anyLong());
 
         thrown.expect(SampleNotFoundException.class);
         thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
         sampleController.deleteSample(1L);
 
-        verify(sampleService).deleteSample(anyLong());
+        verify(sampleService).deleteSample(1L);
     }
 
     @Test
     public void sampleControllerShouldHandleSampleNotFoundException() {
-        ResponseEntity<Object> result = sampleController.SampleNotFoundException();
+        ResponseEntity<Object> result = sampleController.sampleNotFoundException();
 
         assertEquals(result.getBody(), SampleNotFoundException.ERROR_MESSAGE);
         assertEquals(result.getStatusCode(), HttpStatus.NOT_FOUND);
@@ -166,9 +179,17 @@ public class SampleControllerTest {
 
     @Test
     public void sampleControllerShouldHandleSampleAlreadyCreatedException() {
-        ResponseEntity<Object> result = sampleController.SampleAlreadyCreatedException();
+        ResponseEntity<Object> result = sampleController.sampleAlreadyCreatedException();
 
         assertEquals(result.getBody(), SampleAlreadyCreatedException.ERROR_MESSAGE);
+        assertEquals(result.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void sampleControllerShouldHandleSampleBadRequestException() {
+        ResponseEntity<Object> result = sampleController.sampleBadRequestException();
+
+        assertEquals(result.getBody(), SampleBadRequestException.ERROR_MESSAGE);
         assertEquals(result.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 }

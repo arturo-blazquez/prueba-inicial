@@ -5,6 +5,10 @@ public class SampleNotFoundException extends Exception {
     public static final String ERROR_MESSAGE = "Sample no está en la base de datos";
 
     public SampleNotFoundException() {
-        super(ERROR_MESSAGE);
+        this(ERROR_MESSAGE);
+    }
+
+    public SampleNotFoundException(String errorMessage) {
+        super(errorMessage);
     }
 }

@@ -120,25 +120,26 @@ public class SampleServiceTest {
         Optional<Sample> optionalSample = Optional.of(sample1);
 
         when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
-        when(sampleRepository.save(sample2)).thenReturn(sample2);
+        when(sampleRepository.save(any(Sample.class))).thenReturn(sample2);
 
-        Sample sampleUpdated = sampleService.updateSample(1L, newName);
+        Sample sampleUpdated = sampleService.updateSample(sample2);
 
         verify(sampleRepository).findById(anyLong());
-        verify(sampleRepository).save(sample2);
+        verify(sampleRepository).save(any(Sample.class));
         assertEquals(sampleUpdated, sample2);
     }
 
     @Test
     public void sampleServiceShouldNotUpdateASampleWhenItDoesNotExists() throws SampleNotFoundException {
         String newName = "Ana";
+        Sample sampleToUpdate = new Sample(3L, newName);
         Optional<Sample> emptyOptionalSample = Optional.empty();
 
         when(sampleRepository.findById(anyLong())).thenReturn(emptyOptionalSample);
 
         thrown.expect(SampleNotFoundException.class);
         thrown.expectMessage(SampleNotFoundException.ERROR_MESSAGE);
-        sampleService.updateSample(1L, newName);
+        sampleService.updateSample(sampleToUpdate);
 
         verify(sampleRepository).findById(anyLong());
     }
@@ -150,11 +151,10 @@ public class SampleServiceTest {
 
         when(sampleRepository.findById(anyLong())).thenReturn(optionalSample);
 
-        Sample sampleDeleted = sampleService.deleteSample(1L);
+        sampleService.deleteSample(1L);
 
         verify(sampleRepository).findById(anyLong());
         verify(sampleRepository).delete(sample1);
-        assertEquals(sampleDeleted, sample1);
     }
 
     @Test

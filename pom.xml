@@ -19,6 +19,16 @@
 
         <jacoco.itreportpath>${project.build.directory}/jacoco</jacoco.itreportpath>
         <jacoco.itreportfile>${jacoco.itreportpath}/jacoco-it.exec</jacoco.itreportfile>
+
+        <sonar.sources>src/main</sonar.sources>
+        <sonar.tests>src/test</sonar.tests>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.coverage.jacoco.xmlReportPaths>target/jacoco</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.jacoco.reportPath>${jacoco.utreportpath}/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>${jacoco.itreportpath}/jacoco-it.exec</sonar.jacoco.itReportPath>
+        <sonar.language>java</sonar.language>
+
     </properties>
 
     <parent>
@@ -53,7 +63,6 @@
             <scope>runtime</scope>
             <version>1.4.199</version>
         </dependency>
-
 
 
         <dependency>

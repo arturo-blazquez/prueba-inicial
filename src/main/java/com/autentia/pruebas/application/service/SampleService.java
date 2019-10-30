@@ -35,19 +35,17 @@ public class SampleService {
         }
     }
 
-    public Sample updateSample(Long sampleId, String newName) throws SampleNotFoundException {
-        Sample sampleToUpdate = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
+    public Sample updateSample(Sample sample) throws SampleNotFoundException {
+        Sample sampleToUpdate = sampleRepository.findById(sample.getId()).orElseThrow(SampleNotFoundException::new);
 
-        sampleToUpdate.setName(newName);
+        sampleToUpdate.setName(sample.getName());
 
         sampleRepository.save(sampleToUpdate);
         return sampleToUpdate;
     }
 
-    public Sample deleteSample(Long sampleId) throws SampleNotFoundException {
+    public void deleteSample(Long sampleId) throws SampleNotFoundException {
         Sample sampleToDelete = sampleRepository.findById(sampleId).orElseThrow(SampleNotFoundException::new);
-
         sampleRepository.delete(sampleToDelete);
-        return sampleToDelete;
     }
 }
