@@ -12,6 +12,9 @@ import org.junit.rules.ExpectedException;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 
@@ -84,15 +87,17 @@ public class SampleControllerTest {
     }
 
     @Test
-    public void sampleControllerShouldAddANewSampleWhenItsDoesntAlreadyExist() throws SampleAlreadyCreatedException {
+    public void sampleControllerShouldAddANewSampleWhenItDoesntAlreadyExist() throws SampleAlreadyCreatedException {
         Sample sample1 = new Sample(1L, "Juan");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
         when(sampleService.addSample(sample1)).thenReturn(sample1);
 
-        Sample sampleAdded = sampleController.addSample(sample1);
+        ResponseEntity<Sample> sampleAdded = sampleController.addSample(sample1);
 
         verify(sampleService).addSample(sample1);
-        assertEquals(sampleAdded, sample1);
+        assertEquals(sampleAdded.getBody(), sample1);
     }
 
     @Test
@@ -149,8 +154,6 @@ public class SampleControllerTest {
 
     @Test
     public void sampleControllerShouldDeleteASampleWhenItExists() throws SampleNotFoundException {
-        Sample sample1 = new Sample(1L, "Juan");
-
         doNothing().when(sampleService).deleteSample(anyLong());
 
         sampleController.deleteSample(1L);

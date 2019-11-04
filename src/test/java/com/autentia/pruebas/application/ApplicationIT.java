@@ -5,6 +5,7 @@ import com.autentia.pruebas.application.exceptions.SampleBadRequestException;
 import com.autentia.pruebas.application.exceptions.SampleNotFoundException;
 import com.autentia.pruebas.application.model.Sample;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -30,7 +31,7 @@ public class ApplicationIT {
     @Autowired
     private MockMvc mvc;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectWriter objectWriter = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     private Sample sample1 = new Sample(1L, "Juan");
     private Sample sample2 = new Sample(2L, "Ana");
@@ -43,14 +44,14 @@ public class ApplicationIT {
 
         mvc.perform(get("/samples").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(objectMapper.writeValueAsString(expectedSamples))));
+                .andExpect(content().string(stringContainsInOrder(sample1.getName(), sample2.getName())));
     }
 
     @Test
     public void returnsOKAndSample1WhenYouRequestSample1() throws Exception {
         mvc.perform(get("/samples/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(objectMapper.writeValueAsString(sample1))));
+                .andExpect(content().string(containsString(objectWriter.writeValueAsString(sample1))));
     }
 
     @Test
@@ -63,15 +64,16 @@ public class ApplicationIT {
     @Test
     public void returnsOKAndSample3WhenYouAddSample3() throws Exception {
         mvc.perform(post("/samples").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newSample)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(objectMapper.writeValueAsString(newSample))));
+                .content(objectWriter.writeValueAsString(newSample)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(containsString(objectWriter.writeValueAsString(newSample))))
+                .andExpect(header().string("Location", containsString("samples/3")));
     }
 
     @Test
     public void returnsERRORWhenYouWhenYouAddSampleAlreadyInDb() throws Exception {
         mvc.perform(post("/samples").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(sample1)))
+                .content(objectWriter.writeValueAsString(sample1)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString(SampleAlreadyCreatedException.ERROR_MESSAGE)));
     }
@@ -82,9 +84,9 @@ public class ApplicationIT {
         Sample updatedSample = new Sample(1L, newName);
 
         mvc.perform(put("/samples/1").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedSample)))
+                .content(objectWriter.writeValueAsString(updatedSample)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(objectMapper.writeValueAsString(updatedSample))));
+                .andExpect(content().string(containsString(objectWriter.writeValueAsString(updatedSample))));
     }
 
     @Test
@@ -93,7 +95,7 @@ public class ApplicationIT {
         Sample updatedSample = new Sample(3L, newName);
 
         mvc.perform(put("/samples/3").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedSample)))
+                .content(objectWriter.writeValueAsString(updatedSample)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString(SampleNotFoundException.ERROR_MESSAGE)));
     }
@@ -104,7 +106,7 @@ public class ApplicationIT {
         Sample updatedSample = new Sample(1L, newName);
 
         mvc.perform(put("/samples/3").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedSample)))
+                .content(objectWriter.writeValueAsString(updatedSample)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString(SampleBadRequestException.ERROR_MESSAGE)));
     }
@@ -112,7 +114,7 @@ public class ApplicationIT {
     @Test
     public void returnsOKWhenYouDeleteSample1() throws Exception {
         mvc.perform(delete("/samples/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

@@ -1,0 +1,44 @@
+Para que funcione Jenkins con tareas debemos:
+
+1.- Indicar el initialAdminPassword que saldrá por consola del contenedor de jenkins
+
+2.- Elegir instalar unicamente el plugin de Git
+
+3.- Configurar un usuario admin:
+    Usuario: admin
+    Contraseña: admin
+    Confirma la contraseña: admin
+    Nombre completo: admin
+    Dirección de email: admin@admin.com
+y click en Save and Finish
+
+4.- Administrar Jenkins -> Global Tool Configuration
+  JDK:
+    Nombre: Java8
+    Instalar automáticamente
+    Java SE Development Kit 8u202
+    Check Estoy deacuerdo con el acuerdo de licencia de kit de desarrollo de 'Java SE'
+  Maven:
+    Nombre: Maven3
+    Check Instalar automáticamente
+    Insatalar desde Apache Versión 3.6.0
+
+5.- Nueva Tarea de estilo libre
+  Configurar el origen del código fuente
+    Repository URL: https://gitlab.com/autentia/staff/onboarding/cursos-boot.git
+    Ponemos nuestro usuario
+    Branch Specifier (blank for 'any'): master
+  Ejecutar tareas 'maven' de orden superior
+    Versión de Maven: Maven3
+    Goles: clean install -Pjenkins
+  Ejecutar tareas 'maven' de orden superior
+    Versión de Maven: Maven3
+    Goles: sonar:sonar -Pjenkins
+  Ejecutar tareas 'maven' de orden superior
+    Versión de Maven: Maven3
+    Goles: package deploy:deploy -s docker/settings.xml -Pdocker
+  Ejecutar linea de comandos (shell)
+    cp docker/back/Dockerfile ./
+    docker build -t autentia/cursosboot:latest .
+    docker stop cursosboot-back || true && docker rm cursosboot-back || true
+    docker run -d --name cursosboot-back -p 8080:8080 --net docker_cursosbootnetwork autentia/cursosboot:latest

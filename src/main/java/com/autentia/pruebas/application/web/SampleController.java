@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/samples")
@@ -33,8 +37,10 @@ public class SampleController {
     }
 
     @PostMapping
-    public Sample addSample(@RequestBody Sample sample) throws SampleAlreadyCreatedException {
-        return sampleService.addSample(sample);
+    public ResponseEntity<Sample> addSample(@RequestBody Sample sample) throws SampleAlreadyCreatedException {
+        Sample createdSample = sampleService.addSample(sample);
+
+        return ResponseEntity.created(getUri(createdSample)).contentType(MediaType.APPLICATION_JSON).body(createdSample);
     }
 
     @PutMapping(value = "/{sampleId}")
@@ -46,6 +52,7 @@ public class SampleController {
     }
 
     @DeleteMapping(value = "/{sampleId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSample(@PathVariable("sampleId") Long sampleId) throws SampleNotFoundException {
         sampleService.deleteSample(sampleId);
     }
@@ -63,5 +70,10 @@ public class SampleController {
     @ExceptionHandler(SampleBadRequestException.class)
     public ResponseEntity<Object> sampleBadRequestException() {
         return new ResponseEntity<>(SampleBadRequestException.ERROR_MESSAGE, HttpStatus.BAD_REQUEST);
+    }
+
+
+    private URI getUri(Sample createdSample) {
+        return ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdSample.getId()).toUri();
     }
 }
