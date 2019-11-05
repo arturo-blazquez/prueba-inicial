@@ -201,8 +201,26 @@
                 </executions>
                 <configuration>
                     <serverId>nexus</serverId>
-                    <nexusUrl>hsamplesboot-nexus:8081/nexus/</nexusUrl>
+                    <nexusUrl>http://samplesboot-nexus:8081/nexus/</nexusUrl>
                     <skipStaging>true</skipStaging>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.lazerycode.jmeter</groupId>
+                <artifactId>jmeter-maven-plugin</artifactId>
+                <version>2.6.0</version>
+                <executions>
+                    <execution>
+                        <id>jmeter-tests</id>
+                        <goals>
+                            <goal>jmeter</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <testFilesDirectory>${project.basedir}/src/test/resources</testFilesDirectory>
+                    <resultsDirectory>${project.basedir}/src/test/resources</resultsDirectory>
                 </configuration>
             </plugin>
         </plugins>
@@ -224,7 +242,7 @@
         </repository>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <url>samplesboot-nexus:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://samplesboot-nexus:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
