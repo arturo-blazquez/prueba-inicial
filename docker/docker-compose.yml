@@ -21,7 +21,7 @@ services:
       - samplesbootnetwork
     container_name: samplesboot-nexus
   sonarqube:
-    image: library/sonarqube:lts-alpine
+    image: library/sonarqube:latest
     networks:
       - samplesbootnetwork
     ports:
