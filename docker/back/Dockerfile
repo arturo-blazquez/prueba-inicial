@@ -1,4 +1,4 @@
-FROM library/openjdk:8-jdk-alpine
+FROM library/openjdk:9-jdk-alpine
 
 WORKDIR ./
 COPY ./target/*.jar ./
