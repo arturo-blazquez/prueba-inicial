@@ -30,10 +30,10 @@ y click en Save and Finish
     Branch Specifier (blank for 'any'): master
   Ejecutar tareas 'maven' de orden superior
     Versión de Maven: Maven3
-    Goles: clean install -Pjenkins
+    Goles: clean install -Pdocker
   Ejecutar tareas 'maven' de orden superior
     Versión de Maven: Maven3
-    Goles: sonar:sonar -Pjenkins
+    Goles: sonar:sonar -Pdocker
   Ejecutar tareas 'maven' de orden superior
     Versión de Maven: Maven3
     Goles: package deploy:deploy -s docker/settings.xml -Pdocker

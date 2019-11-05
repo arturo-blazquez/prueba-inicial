@@ -201,7 +201,7 @@
                 </executions>
                 <configuration>
                     <serverId>nexus</serverId>
-                    <nexusUrl>http://172.20.0.5:8081/nexus/</nexusUrl>
+                    <nexusUrl>http://172.20.0.4:8081/nexus/</nexusUrl>
                     <skipStaging>true</skipStaging>
                 </configuration>
             </plugin>
@@ -220,11 +220,11 @@
     <distributionManagement>
         <repository>
             <id>nexus-snapshots</id>
-            <url>http://172.20.0.5:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://172.20.0.4:8081/nexus/content/repositories/snapshots/</url>
         </repository>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <url>http://172.20.0.5:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://172.20.0.4:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
