@@ -36,7 +36,7 @@ y click en Save and Finish
     Goles: sonar:sonar -Pdocker -Dsonar.host.url=http://samplesboot-sonarqube:9000
   Ejecutar tareas 'maven' de orden superior
     Versión de Maven: Maven3
-    Goles: package deploy:deploy -s docker/settings.xml -Pdocker -Dmaven.test.skip=true
+    Goles: deploy -s docker/settings.xml -Pdocker -Dmaven.test.skip=true -DskipTests
   Ejecutar linea de comandos (shell)
     cp docker/back/Dockerfile ./
     docker build -t autentia/cursosboot:latest .
